@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import {
   StyleSheet,
-  Text,
   TextInput,
   View,
   TouchableOpacity,
@@ -13,6 +12,8 @@ import {
 import { StatusBar } from 'expo-status-bar';
 import Constants from 'expo-constants';
 import { Ionicons } from '@expo/vector-icons';
+import TodoItem from './components/TodoItem';
+import Title from './components/Title';
 
 const initialTodos = [
   { id: '1', name: "Buy groceries" },
@@ -22,8 +23,7 @@ const initialTodos = [
 export default function App() {
   const [todos, setTodos] = useState(initialTodos);
   const [newTodo, setNewTodo] = useState('');
-  const [editTitle, setEditTitle] = useState(false);
-  const [title, setTitle] = useState('My Todo List');
+  
 
   const addTodo = () => {
     if (newTodo.trim() !== '') {
@@ -37,12 +37,10 @@ export default function App() {
   };
 
   const renderItem = ({ item }) => (
-    <View style={styles.todoItem}>
-      <Text style={styles.todoText}>{item.name}</Text>
-      <TouchableOpacity onPress={() => removeTodo(item.id)} style={styles.deleteButton}>
-        <Ionicons name="trash-outline" size={24} color="#fff" />
-      </TouchableOpacity>
-    </View>
+    <TodoItem
+      item={item}
+      removeTodo={removeTodo}
+    />
   );
 
   return (
@@ -52,20 +50,7 @@ export default function App() {
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.content}
       >
-        <TouchableOpacity onPress={() => setEditTitle(editing => !editing)}>
-          {editTitle ? (
-            <TextInput
-              style={styles.title}
-              value={title}
-              onChangeText={setTitle}
-              onSubmitEditing={() => setEditTitle(false)}
-              autoFocus
-            />
-          ) : (
-            <Text style={styles.title}>{title}</Text>
-          )}
-        </TouchableOpacity>
-
+        <Title/>
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.input}
@@ -100,13 +85,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
   },
-  title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    marginBottom: 30,
-    color: '#ecf0f1',
-    textAlign: 'start',
-  },
+
   inputContainer: {
     flexDirection: 'row',
     marginBottom: 20,
@@ -131,24 +110,5 @@ const styles = StyleSheet.create({
   },
   list: {
     flex: 1,
-  },
-  todoItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: '#34495e',
-    padding: 15,
-    borderRadius: 10,
-    marginBottom: 10,
-  },
-  todoText: {
-    fontSize: 18,
-    color: '#ecf0f1',
-    flex: 1,
-  },
-  deleteButton: {
-    backgroundColor: '#e74c3c',
-    padding: 10,
-    borderRadius: 5,
   },
 });
