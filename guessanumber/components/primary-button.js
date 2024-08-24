@@ -24,15 +24,18 @@ export default function PrimaryButton({ children }) {
 
 const styles = StyleSheet.create({
     buttonOuterContainer:{
+        flex:1,
+        alignItems:'center',
         borderRadius: 28,
         margin: 4,
         overflow:'hidden'
     },
-    buttonInnerContainer: {
+    buttonInnerContainer: {  
+        width:"100%",
         backgroundColor: '#72063c',
-        borderRadius: 28,
         paddingVertical: 8,
         paddingHorizontal: 16,
+        alignItems:"center",
         elevation: 2
     },
     buttonText: {
