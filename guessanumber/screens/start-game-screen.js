@@ -1,30 +1,71 @@
 import {
     View,
     TextInput,
-    StyleSheet
+    StyleSheet,
+    Alert
 } from "react-native"
-import PrimaryButton from "../components/primary-button"
+import PrimaryButton from "../components/primary-button";
+import { useState } from "react"
+import Card from "../components/card";
 
-export default function StartGameScreen() {
+export default function StartGameScreen({onStartGame}) {
+
+    const [number,setNumber] = useState('');
+
+    function numberInputHandler(value){
+        setNumber(value);
+    }
+
+    function confirmInputHandler(){
+        const integerValue = parseInt(number);
+
+        if (isNaN(integerValue) || integerValue<0 || integerValue>99){
+            Alert.alert(
+                'Invalid Number',
+                'Only numbers b/w 0 to 99 (99 included) are valid!',
+                [
+                    {
+                        text:'Okay',
+                        onPress:resetHandler,
+                        style:'destructive'
+                    }
+                ]
+            )
+        }
+
+        onStartGame(integerValue)
+        
+    }
+
+    function resetHandler(){
+        setNumber('');
+    }
+
     return (
         <View style={styles.mainContainer}>
-            <View style={styles.inputContainer}>
+            <Card>
                 <TextInput
                     style={styles.numberInput}
                     maxLength={2}
                     keyboardType="number-pad"  
                     autoCapitalize="none"
                     autoCorrect={false}
+                    value={number}
+                    onChangeText={numberInputHandler}
                 />
                 <View style={styles.buttonsContainer}>
-                    <PrimaryButton>
-                        Submit
-                    </PrimaryButton>
-                    <PrimaryButton>
+                    <PrimaryButton
+                        onPress={resetHandler}
+                    >
                         Reset
                     </PrimaryButton>
+                    <PrimaryButton
+                        onPress={confirmInputHandler}
+                    >
+                        Submit
+                    </PrimaryButton>
                 </View>
-            </View>
+            </Card>
         </View>
     )
 }
@@ -35,14 +76,6 @@ const styles = StyleSheet.create({
         justifyContent:"center",
         alignItems:"center",
         width:"100%",
-    },
-    inputContainer:{
-        padding:8,
-        backgroundColor:"#4e0329",
-        width:"80%",
-        borderRadius:8,
-        elevation:6,
-        gap:12,
     },
     buttonsContainer:{
         flexDirection:"row",
