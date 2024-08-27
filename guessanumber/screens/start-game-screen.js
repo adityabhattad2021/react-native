@@ -7,6 +7,8 @@ import {
 import PrimaryButton from "../components/primary-button";
 import { useState } from "react"
 import Card from "../components/card";
+import Colors from "../constants/colors";
+import Title from "../components/title";
 
 export default function StartGameScreen({onStartGame}) {
 
@@ -43,6 +45,7 @@ export default function StartGameScreen({onStartGame}) {
 
     return (
         <View style={styles.mainContainer}>
+            <Title text="Enter a number" style={styles.title}/>
             <Card>
                 <TextInput
                     style={styles.numberInput}
@@ -71,6 +74,9 @@ export default function StartGameScreen({onStartGame}) {
 }
 
 const styles = StyleSheet.create({
+    title:{
+        marginBottom:30
+    },
     mainContainer:{
         flex:1,
         justifyContent:"center",
@@ -85,9 +91,9 @@ const styles = StyleSheet.create({
         height:50,
         width:50,
         fontSize:32,
-        borderBottomColor:'#ddb52f',
+        borderBottomColor:Colors.foreground.primary,
         borderBottomWidth:2,
-        color:'#ddb52f',
+        color:Colors.foreground.primary,
         marginVertical:8,
         fontWeight:'bold',
         alignSelf:'center',

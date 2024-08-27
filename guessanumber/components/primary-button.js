@@ -4,6 +4,7 @@ import {
     Text,
     Pressable
 } from "react-native";
+import Colors from "../constants/colors";
 
 export default function PrimaryButton({ children,onPress }) {
 
@@ -28,14 +29,14 @@ const styles = StyleSheet.create({
     },
     buttonInnerContainer: {  
         width:"100%",
-        backgroundColor: '#72063c',
+        backgroundColor: Colors.background.primary,
         paddingVertical: 8,
         paddingHorizontal: 16,
         alignItems:"center",
         elevation: 2
     },
     buttonText: {
-        color: 'white',
+        color: Colors.accent.primary,
         elevation: 4,
     }
 })

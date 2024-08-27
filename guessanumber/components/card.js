@@ -1,4 +1,5 @@
 import { View,StyleSheet } from "react-native";
+import Colors from "../constants/colors";
 
 export default function Card({children,style}){
     return (
@@ -11,7 +12,7 @@ export default function Card({children,style}){
 const styles = StyleSheet.create({
     container:{
         padding:8,
-        backgroundColor:"#4e0329",
+        backgroundColor:Colors.background.tertiary,
         width:"80%",
         borderRadius:8,
         elevation:6,

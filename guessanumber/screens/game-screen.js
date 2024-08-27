@@ -4,6 +4,7 @@ import {
     StyleSheet
 } from "react-native"
 import Title from "../components/title";
+import Colors from "../constants/colors";
 
 function generateRandomNumber(min, max, exclude) {
     const randomNumber = Math.floor(Math.random() * (max - min)) + min;
@@ -17,9 +18,8 @@ function generateRandomNumber(min, max, exclude) {
 export default function GameScreen() {
     return (
         <View style={styles.screen}>
-            <Title>
-                Opponent's Guess
-            </Title>
+            <Title text="Opponent's Guess"/>
+               
             <View style={styles.gameBox}>
                 {/* Guess */}
                 <View>
@@ -43,7 +43,7 @@ const styles = StyleSheet.create({
         gap: 60
     },
     gameBox: {
-        backgroundColor: '#4e0329',
+        backgroundColor: Colors.background.secondary,
         borderRadius: 12,
         width: "80%",
         padding: 8,
