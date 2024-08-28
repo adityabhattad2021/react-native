@@ -4,9 +4,22 @@ import { LinearGradient } from "expo-linear-gradient"
 import StartGameScreen from './screens/start-game-screen';
 import { useState } from 'react';
 import GameScreen from './screens/game-screen';
+import GameOverScreen from './screens/game-over-screen';
 
 export default function App() {
-	const [correctAnswer, setCorrectAnswer] = useState();
+	const [correctAnswer, setCorrectAnswer] = useState(null);
+	const [isGameOver, setIsGameOver] = useState(false);
+
+	function handleRestart() {
+		setCorrectAnswer(null);
+		setIsGameOver(false);
+	}
+
+	function handleGameOver(){
+		console.log("Why!!!")
+		setIsGameOver(true);
+	}
+
 	return (
 		<LinearGradient colors={['#4e0329', '#ddb52f']} style={styles.rootScreen}>
 			<ImageBackground
@@ -17,7 +30,13 @@ export default function App() {
 			>
 				<StatusBar style="light" />
 				<SafeAreaView style={styles.rootScreen}>
-					{correctAnswer ? <GameScreen /> : <StartGameScreen onStartGame={setCorrectAnswer} />}
+					{correctAnswer ?
+						(
+							isGameOver ?
+								<GameOverScreen handleRestart={handleRestart} /> :
+								<GameScreen correctAnswer={correctAnswer} handleGameOver={handleGameOver} />
+						) :
+						<StartGameScreen onStartGame={setCorrectAnswer} />}
 				</SafeAreaView>
 			</ImageBackground>
 		</LinearGradient>
