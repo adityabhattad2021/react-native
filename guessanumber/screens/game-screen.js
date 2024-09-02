@@ -2,147 +2,171 @@ import {
     View,
     Text,
     StyleSheet,
-    Alert
+    Alert,
+    FlatList,
+    SafeAreaView
 } from "react-native"
 import Title from "../components/title";
 import Colors from "../constants/colors";
-import { useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Card from "../components/card";
 import PrimaryButton from "../components/primary-button";
 import { Ionicons } from '@expo/vector-icons';
 
-function generateRandomNumber(min, max, exclude, toExclude) {
-    console.log("Random Number", min, max)
-    let randomNumber = Math.floor(Math.random() * (max - min)) + min;
-    while (randomNumber === exclude && toExclude) {
-        randomNumber = Math.floor(Math.random() * (max - min)) + min
-    }
-    return randomNumber;
+function generateRandomNumber(min,max,exclude){
+    const randomNumber = Math.floor(Math.random()*(max-min))+min;
+    return randomNumber === exclude ? generateRandomNumber(min,max,exclude) : randomNumber; 
 }
 
-export default function GameScreen({ correctAnswer,handleGameOver }) {
+export default function GameScreen({ correctAnswer, handleGameOver, setMoves, moves }) {
 
     const [minVal, setMinVal] = useState(0);
     const [maxVal, setMaxVal] = useState(100);
-    const [computerGuess, setComputerGuess] = useState(state => {
-        return generateRandomNumber(minVal, maxVal, correctAnswer, true)
-    });
+    const [currentGuess,setCurrentGuess] = useState(()=>generateRandomNumber(1,100,correctAnswer))
 
-    function handleOnPress(symbol) {
-        let newMinVal = minVal;
-        let newMaxVal = maxVal;
-        let flag = true;
-        switch (symbol) {
-            case "+": {
-                if(computerGuess>correctAnswer){
-                    Alert.alert(
-                        'Please don\'t!',
-                        'Trust us you don\'t want to get stuck in an endless loop!',
-                        [
-                            {
-                                text: 'Okay',
-                                
-                                style: 'destructive'
-                            }
-                        ]
-                    )
-                    flag = false;
-                }else{
-                    newMinVal = computerGuess;
-                    setMinVal(newMinVal);
+    useEffect(()=>{
+        setMoves(prevMoves=>[currentGuess,...prevMoves])
+    },[currentGuess,setMoves])
+
+    useEffect(()=>{
+        if(currentGuess===correctAnswer){
+            Alert.alert('Game Over','We hope you had fun playing this stupid game!',[
+                {
+                    text:'Okay',
+                    onPress:handleGameOver
                 }
-                break;
-            }
-            case "-": {
-                if(computerGuess<correctAnswer){
-                    Alert.alert(
-                        'Please don\'t!',
-                        'Trust us you don\'t want to get stuck in an endless loop!',
-                        [
-                            {
-                                text: 'Okay',
-                                style: 'destructive'
-                            }
-                        ]
-                    )
-                    flag = false;
-                }else{
-                    newMaxVal = computerGuess;
-                    setMaxVal(newMaxVal);
+            ])
+        }
+    },[currentGuess,correctAnswer,handleGameOver]);
+
+    const nextGuessHandler = useCallback((direction)=>{
+        if(direction === 'lower' && currentGuess < correctAnswer || direction ==='higher' && currentGuess>correctAnswer){
+            Alert.alert('Don\'t lie!','Don\'t lie trust us you don\'t wanna be stuck playing this stupid game...',[
+                {
+                    text:'Sorry!',
+                    style:'cancel'
                 }
-                break;
-            }
+            ])
         }
-        if(!flag){
-            return;
+
+        if(direction==='lower'){
+            setMaxVal(currentGuess)
+        }else{
+            setMinVal(currentGuess+1)
         }
-        const val = generateRandomNumber(newMinVal, newMaxVal, correctAnswer, false);
-        if (val === correctAnswer) {
-            Alert.alert(
-                'Game over!',
-                'We hope you had fun playing this stupid game!',
-                [
-                    {
-                        text: 'Okay',
-                        onPress: handleGameOver,
-                        style: 'default'
-                    }
-                ]
-            )
-        } else {
-            setComputerGuess(val);
-        }
-    }
+
+        const newRandomNumber = generateRandomNumber(
+            direction === 'lower' ? minVal : currentGuess+1,
+            direction === 'lower' ? currentGuess : maxVal,
+            currentGuess
+        )
+        setCurrentGuess(newRandomNumber)
+    },[currentGuess,minVal,maxVal,correctAnswer])
+    
+    const guessRoundListLength = useMemo(()=>moves.length,[moves])
 
     return (
-        <View style={styles.screen}>
-            <Title text="Opponent's Guess" />
-            <Card >
-
-                <View>
-                    {/* Guess */}
-                    <Text style={styles.guess}>
-                        {computerGuess}
-                    </Text>
-                    <View style={styles.buttonsContainer}>
-                        <PrimaryButton
-                            onPress={() => handleOnPress("-")}
-                        >
-                            <Ionicons name="remove" size={24} color={Colors.foreground.primary} />
-                        </PrimaryButton>
-                        <PrimaryButton
-                            onPress={() => handleOnPress("+")}
-                        >
-                            <Ionicons name="add" size={24} color={Colors.foreground.primary} />
-                        </PrimaryButton>
-                    </View>
+        <SafeAreaView style={styles.screen}>
+           <Title
+                text="Opponent's guess"
+           />
+           <Card>
+                <Text style={styles.guess}>
+                    {currentGuess}
+                </Text>
+                <View style={styles.buttonsContainer}>
+                    <PrimaryButton
+                        onPress={()=>nextGuessHandler('lower')}
+                    >   
+                        <Ionicons
+                            name="remove"
+                            size={24}
+                            color={Colors.foreground.primary}
+                        />
+                    </PrimaryButton>
+                    <PrimaryButton
+                        onPress={()=>nextGuessHandler('higher')}
+                    >
+                        <Ionicons
+                            name="add"
+                            size={24}
+                            color={Colors.foreground.primary}
+                        />
+                    </PrimaryButton>    
                 </View>
-                {/* <View>TODO: Log Rounds here.</View> */}
-            </Card>
-        </View>
+           </Card>
+           <View style={styles.listContainer}>
+            <Text
+                style={styles.statsTitle}
+            >   
+                Previous Guesses
+            </Text>
+            <FlatList
+                data={moves}
+                renderItem={({item,index})=>(
+                    <View style={styles.moveItem}>
+                        <Text style={styles.moveNumber}>#{guessRoundListLength-index}</Text>
+                        <Text style={styles.moveValue}>{item}</Text>
+                    </View>
+                )}
+                keyExtractor={(_,index)=>`guess-${index}`}
+                contentContainerStyle={styles.flatListContent}
+            />
+           </View>
+        </SafeAreaView>
     )
 }
 
 const styles = StyleSheet.create({
+    screen: {
+        marginTop:24,
+        flex: 1,
+        padding:24,
+        alignItems:'center',
+        gap:30,
+    },
     guess: {
-        height: 50,
-        width: 50,
-        fontSize: 32,
-        color: Colors.foreground.primary,
-        marginVertical: 8,
-        fontWeight: 'bold',
-        alignSelf: 'center',
-        textAlign: 'center'
+        fontSize:32,
+        fontWeight:'bold',
+        color:Colors.foreground.primary,
+        textAlign:'center',
+        marginVertical:24,
     },
     buttonsContainer: {
-        flexDirection: "row",
-        justifyContent: "space-around"
+        flexDirection: 'row',
+        justifyContent: 'space-around',
     },
-    screen: {
-        flex: 1,
-        padding: 24,
-        justifyContent: "center",
-        alignItems: "center",
-        gap: 60
+    listContainer:{
+        flex:1,
+        padding:16,
     },
+    statsTitle:{
+        fontSize:20,
+        fontWeight:"bold",
+        color:Colors.foreground.primary,
+        textAlign:'center',
+        marginVertical:16,
+    },
+    flatListContent:{
+        flexGrow:1,
+    },
+    moveItem:{
+        flexDirection:'row',
+        justifyContent:'space-between',
+        borderColor:Colors.background.tertiary,
+        borderWidth:1,
+        borderRadius:40,
+        paddingVertical:12,
+        paddingHorizontal:32,
+        marginVertical:8,
+    },
+    moveNumber:{
+        fontSize:16,
+        fontWeight:"bold",
+        color:Colors.accent.secondary
+    },
+    moveValue:{
+        fontSize:18,
+        color:Colors.accent.primary
+    }
 })

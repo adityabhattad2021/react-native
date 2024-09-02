@@ -9,14 +9,15 @@ import GameOverScreen from './screens/game-over-screen';
 export default function App() {
 	const [correctAnswer, setCorrectAnswer] = useState(null);
 	const [isGameOver, setIsGameOver] = useState(false);
+	const [moves,setMoves] = useState([]);
 
 	function handleRestart() {
+		setMoves([]);
 		setCorrectAnswer(null);
 		setIsGameOver(false);
 	}
 
 	function handleGameOver(){
-		console.log("Why!!!")
 		setIsGameOver(true);
 	}
 
@@ -33,8 +34,8 @@ export default function App() {
 					{correctAnswer ?
 						(
 							isGameOver ?
-								<GameOverScreen handleRestart={handleRestart} /> :
-								<GameScreen correctAnswer={correctAnswer} handleGameOver={handleGameOver} />
+								<GameOverScreen handleRestart={handleRestart} correctAnswer={correctAnswer} numberOfMoves={moves.length} /> :
+								<GameScreen correctAnswer={correctAnswer} setMoves={setMoves} moves={moves} handleGameOver={handleGameOver} />
 						) :
 						<StartGameScreen onStartGame={setCorrectAnswer} />}
 				</SafeAreaView>
